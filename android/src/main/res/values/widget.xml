@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="widget_bg">#F2F0EE</color>
+    <color name="widget_text_primary">#1F1E1E</color>
+    <color name="widget_text_secondary">#6B6966</color>
+    <color name="widget_accent">#4B70CC</color>
+    <!-- The same green and grey the app uses for connected and disconnected devices. -->
+    <color name="widget_connected">#1CA672</color>
+    <color name="widget_disconnected">#AFACAB</color>
+    <dimen name="widget_corner_radius">16dp</dimen>
+</resources>

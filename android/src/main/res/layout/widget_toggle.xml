@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@android:id/background"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_bg"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="5dp">
+
+    <!-- RemoteViews cannot use AppCompat's app: attributes, hence the framework drawable. -->
+    <TextView
+        android:id="@+id/widget_toggle_name"
+        android:layout_width="match_parent"
+        android:layout_height="16dp"
+        android:autoSizeMaxTextSize="11sp"
+        android:autoSizeMinTextSize="7sp"
+        android:autoSizeStepGranularity="0.5sp"
+        android:autoSizeTextType="uniform"
+        android:drawablePadding="3dp"
+        android:ellipsize="end"
+        android:gravity="center"
+        android:maxLines="1"
+        android:text="@string/tile_name"
+        android:textColor="@color/widget_text_primary"
+        android:textStyle="bold"
+        android:drawableStart="@drawable/widget_dot_off"
+        tools:ignore="UseCompatTextViewDrawableXml" />
+
+    <!-- A full IPv4 address does not fit a 1x1 cell at a fixed size, so let it shrink. -->
+    <TextView
+        android:id="@+id/widget_toggle_detail"
+        android:layout_width="match_parent"
+        android:layout_height="14dp"
+        android:autoSizeMaxTextSize="10sp"
+        android:autoSizeMinTextSize="6sp"
+        android:autoSizeStepGranularity="0.5sp"
+        android:autoSizeTextType="uniform"
+        android:gravity="center"
+        android:maxLines="1"
+        android:text="@string/not_connected"
+        android:textColor="@color/widget_text_secondary" />
+
+    <ImageView
+        android:id="@+id/widget_toggle_switch"
+        android:layout_width="39dp"
+        android:layout_height="24dp"
+        android:layout_marginTop="6dp"
+        android:contentDescription="@null"
+        android:src="@drawable/widget_switch_off" />
+</LinearLayout>

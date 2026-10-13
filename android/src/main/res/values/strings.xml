@@ -407,4 +407,8 @@
     <string name="copy_magic_dns_address">Copy MagicDNS hostname</string>
     <string name="copy_ipv4_address">Copy IPv4</string>
     <string name="copy_ipv6_address">Copy IPv6</string>
+
+    <!-- Home screen widgets -->
+    <string name="widget_toggle_label">Tailscale toggle</string>
+    <string name="widget_toggle_description">Connect or disconnect Tailscale</string>
 </resources>

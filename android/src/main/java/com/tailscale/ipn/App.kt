@@ -40,6 +40,7 @@ import com.tailscale.ipn.util.HardwareKeyStore
 import com.tailscale.ipn.util.NoSuchKeyException
 import com.tailscale.ipn.util.ShareFileHelper
 import com.tailscale.ipn.util.TSLog
+import com.tailscale.ipn.widget.Widgets
 import java.io.IOException
 import java.lang.UnsupportedOperationException
 import java.net.NetworkInterface
@@ -51,7 +52,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
@@ -114,6 +117,7 @@ class App : UninitializedApp(), libtailscale.AppContext, ViewModelStoreOwner {
     super.onCreate()
     appInstance = this
     setUnprotectedInstance(this)
+    Widgets.onProcessStart(this)
     mdmChangeReceiver = MDMSettingsChangedReceiver()
     val filter = IntentFilter(Intent.ACTION_APPLICATION_RESTRICTIONS_CHANGED)
     registerReceiver(mdmChangeReceiver, filter)
@@ -224,6 +228,14 @@ class App : UninitializedApp(), libtailscale.AppContext, ViewModelStoreOwner {
               }
             }
       }
+    }
+    applicationScope.launch {
+      // Keep the home screen widgets in sync. NoState only means the backend has not reported
+      // anything yet, so it carries no information for them.
+      combine(Notifier.state, Notifier.netmap) { state, netmap -> Pair(state, netmap) }
+          .filter { (state, _) -> state != Ipn.State.NoState }
+          .conflate()
+          .collect { (state, netmap) -> Widgets.publish(this@App, state, netmap) }
     }
     applicationScope.launch {
       combine(Notifier.netmap, MDMSettings.keyExpirationNotice.flow) { netmap, keyExpirationNotice
