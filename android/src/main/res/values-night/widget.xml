@@ -5,4 +5,6 @@
     <color name="widget_text_secondary">#AFACAB</color>
     <color name="widget_accent">#8FB0FF</color>
     <color name="widget_disconnected">#706E6D</color>
+    <color name="widget_container">#3A3938</color>
+    <color name="widget_button">#4E4D4C</color>
 </resources>

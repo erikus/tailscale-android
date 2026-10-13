@@ -29,8 +29,8 @@ object Widgets {
   }
 
   /** Records the current backend state and redraws the widgets if anything they show changed. */
-  fun publish(context: Context, state: Ipn.State, netmap: Netmap.NetworkMap?) {
-    val snapshot = WidgetSnapshot.from(WidgetSnapshotStore.load(context), state, netmap)
+  fun publish(context: Context, state: Ipn.State, prefs: Ipn.Prefs?, netmap: Netmap.NetworkMap?) {
+    val snapshot = WidgetSnapshot.from(WidgetSnapshotStore.load(context), state, prefs, netmap)
     if (WidgetSnapshotStore.save(context, snapshot)) {
       redrawAll(context)
     }
@@ -43,6 +43,11 @@ object Widgets {
         context,
         manager,
         manager.getAppWidgetIds(ComponentName(context, ToggleWidgetProvider::class.java)),
+    )
+    StatusWidgetProvider.render(
+        context,
+        manager,
+        manager.getAppWidgetIds(ComponentName(context, StatusWidgetProvider::class.java)),
     )
   }
 

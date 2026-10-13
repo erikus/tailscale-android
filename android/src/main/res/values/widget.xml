@@ -8,4 +8,17 @@
     <color name="widget_connected">#1CA672</color>
     <color name="widget_disconnected">#AFACAB</color>
     <dimen name="widget_corner_radius">16dp</dimen>
+    <!-- The exit node box of the status widget, and its button. -->
+    <color name="widget_container">#E6E4E2</color>
+    <color name="widget_button">#D2CFCD</color>
+    <color name="widget_on_accent">#FFFFFF</color>
+
+    <!-- The exit node dialog draws its own scrim and card over the home screen. -->
+    <style name="Theme.Widget.Dialog" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation.Dialog</item>
+    </style>
 </resources>

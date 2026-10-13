@@ -232,10 +232,12 @@ class App : UninitializedApp(), libtailscale.AppContext, ViewModelStoreOwner {
     applicationScope.launch {
       // Keep the home screen widgets in sync. NoState only means the backend has not reported
       // anything yet, so it carries no information for them.
-      combine(Notifier.state, Notifier.netmap) { state, netmap -> Pair(state, netmap) }
-          .filter { (state, _) -> state != Ipn.State.NoState }
+      combine(Notifier.state, Notifier.prefs, Notifier.netmap) { state, prefs, netmap ->
+            Triple(state, prefs, netmap)
+          }
+          .filter { (state, _, _) -> state != Ipn.State.NoState }
           .conflate()
-          .collect { (state, netmap) -> Widgets.publish(this@App, state, netmap) }
+          .collect { (state, prefs, netmap) -> Widgets.publish(this@App, state, prefs, netmap) }
     }
     applicationScope.launch {
       combine(Notifier.netmap, MDMSettings.keyExpirationNotice.flow) { netmap, keyExpirationNotice

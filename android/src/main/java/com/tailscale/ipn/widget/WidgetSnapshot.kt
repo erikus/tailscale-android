@@ -7,10 +7,15 @@ import android.content.Context
 import androidx.core.content.edit
 import com.tailscale.ipn.ui.model.Ipn
 import com.tailscale.ipn.ui.model.Netmap
+import com.tailscale.ipn.ui.model.StableNodeID
 import com.tailscale.ipn.util.TSLog
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+
+/** An exit node as shown in the exit node list of the status widget. */
+@Serializable
+data class WidgetExitNode(val id: StableNodeID, val label: String, val online: Boolean)
 
 /**
  * WidgetSnapshot is everything the home screen widgets need in order to render. It is persisted so
@@ -20,6 +25,15 @@ import kotlinx.serialization.json.Json
 @Serializable
 data class WidgetSnapshot(
     val vpnRunning: Boolean = false,
+    // Exit nodes in the user's tailnet. Mullvad nodes are excluded: there are too many of them for
+    // a widget, so they are picked in the app instead.
+    val exitNodes: List<WidgetExitNode> = emptyList(),
+    val activeExitNodeId: StableNodeID? = null,
+    val activeExitNodeName: String? = null,
+    // The exit node that was in use before exit node use was switched off, if any. Switching exit
+    // node use back on returns to it.
+    val priorExitNodeId: StableNodeID? = null,
+    val priorExitNodeName: String? = null,
     // This device's name and Tailscale IPv4 address.
     val selfName: String? = null,
     val selfAddress: String? = null,
@@ -27,25 +41,60 @@ data class WidgetSnapshot(
     // same for personal tailnets but is not available without the backend.
     val tailnetName: String? = null,
 ) {
+  /** The exit node the Enable / Disable button acts on: the one in use, else the one last used. */
+  val configuredExitNodeId: StableNodeID?
+    get() = activeExitNodeId ?: priorExitNodeId
+
+  val configuredExitNodeName: String?
+    get() = if (activeExitNodeId != null) activeExitNodeName else priorExitNodeName
+
   companion object {
     /**
      * Derives a snapshot from the backend state. [previous] supplies values the backend has not
-     * reported yet (the netmap arrives some time after the backend starts).
+     * reported yet (the netmap and prefs arrive some time after the backend starts).
      */
     fun from(
         previous: WidgetSnapshot,
         state: Ipn.State,
+        prefs: Ipn.Prefs?,
         netmap: Netmap.NetworkMap?,
     ): WidgetSnapshot {
       val vpnRunning = state == Ipn.State.Starting || state == Ipn.State.Running
       if (state == Ipn.State.NeedsLogin) {
         return WidgetSnapshot(vpnRunning = vpnRunning)
       }
+
+      val activeId: StableNodeID? =
+          if (prefs != null) prefs.activeExitNodeID else previous.activeExitNodeId
+      val priorId: StableNodeID? =
+          if (prefs != null) prefs.selectedExitNodeID else previous.priorExitNodeId
       if (netmap == null) {
-        return previous.copy(vpnRunning = vpnRunning)
+        return previous.copy(
+            vpnRunning = vpnRunning,
+            activeExitNodeId = activeId,
+            priorExitNodeId = priorId,
+        )
+      }
+
+      val peers = netmap.Peers.orEmpty()
+      val exitNodes =
+          peers
+              .filter { it.isExitNode && !it.isMullvadNode }
+              .map {
+                WidgetExitNode(id = it.StableID, label = it.displayName, online = it.Online == true)
+              }
+              .sortedBy { it.label.lowercase() }
+      // An exit node that is missing from the netmap is shown by its ID, like the app does.
+      fun nameOf(id: StableNodeID?): String? = id?.let {
+        peers.find { peer -> peer.StableID == it }?.exitNodeName ?: it
       }
       return WidgetSnapshot(
           vpnRunning = vpnRunning,
+          exitNodes = exitNodes,
+          activeExitNodeId = activeId,
+          activeExitNodeName = nameOf(activeId),
+          priorExitNodeId = priorId,
+          priorExitNodeName = nameOf(priorId),
           selfName = netmap.SelfNode.displayName.takeIf { it.isNotEmpty() },
           selfAddress = netmap.SelfNode.primaryIPv4Address,
           tailnetName = netmap.Domain.takeIf { it.isNotEmpty() },

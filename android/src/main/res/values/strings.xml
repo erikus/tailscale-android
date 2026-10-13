@@ -411,4 +411,10 @@
     <!-- Home screen widgets -->
     <string name="widget_toggle_label">Tailscale toggle</string>
     <string name="widget_toggle_description">Connect or disconnect Tailscale</string>
+    <string name="widget_exit_node_title">Exit node</string>
+    <string name="widget_status_label">Tailscale</string>
+    <string name="widget_status_description">Connection, this device and exit node at a glance</string>
+    <string name="widget_status_exit_title">EXIT NODE</string>
+    <string name="widget_exit_node_more">More in Tailscale…</string>
+    <string name="widget_exit_node_offline">%s (offline)</string>
 </resources>

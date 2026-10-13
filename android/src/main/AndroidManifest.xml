@@ -132,6 +132,34 @@
                 android:resource="@xml/widget_toggle_info" />
         </receiver>
 
+        <receiver
+            android:name=".widget.StatusWidgetProvider"
+            android:exported="false"
+            android:label="@string/widget_status_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_status_info" />
+        </receiver>
+
+        <!-- Carries out the exit node choices made in the status widget and its dialog. -->
+        <receiver
+            android:name=".widget.ExitNodeActionReceiver"
+            android:exported="false" />
+
+        <!-- The exit node list opened from the status widget. It floats over the home screen in a
+             task of its own, so that it does not drag the main activity along. -->
+        <activity
+            android:name=".widget.ExitNodeDialogActivity"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:label="@string/widget_exit_node_title"
+            android:noHistory="true"
+            android:taskAffinity=""
+            android:theme="@style/Theme.Widget.Dialog" />
+
         <service
             android:name=".IPNService"
             android:exported="false"
